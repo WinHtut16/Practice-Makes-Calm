@@ -1,0 +1,23 @@
+{% extends "study/base.html" %}
+{% block content %}
+<h1>Look back at Dr. Lee's messages</h1>
+<p class="muted">These are your practice rounds with the {{ colour }} Dr. Lee. Your own messages are shown in grey for context. Tick any tag that fits one of <strong>Dr. Lee's</strong> messages and, if you like, say why in a few words. <strong>If a message felt normal or okay, leave it untagged.</strong> Untagged means "nothing stood out".</p>
+<form method="post">{% csrf_token %}<input type="hidden" name="step_no" value="{{ p.step }}">
+{% for rn, msgs in tag_rounds %}
+  <h2>Practice round {{ rn }}</h2>
+  {% for m in msgs %}
+  {% if m.role == "learner" %}
+  <div class="tagctx"><span class="who">You</span><div class="msg learner-ctx inline">{{ m.text }}</div></div>
+  {% else %}
+  <div class="card tagrow">
+    <span class="who">Dr. Lee</span>
+    <div class="msg drlee inline">{{ m.text }}</div>
+    <div class="tagopts">{% for t in tags %}<label class="tag"><input type="checkbox" name="tag_{{ m.id }}_{{ t }}" value="1"> {{ t }}</label>{% endfor %}</div>
+    <input type="text" name="reason_{{ m.id }}" placeholder="Why? (optional)" maxlength="300">
+  </div>
+  {% endif %}
+  {% empty %}<p class="muted">No messages in this round.</p>{% endfor %}
+{% endfor %}
+<button class="btn">Continue</button>
+</form>
+{% endblock %}

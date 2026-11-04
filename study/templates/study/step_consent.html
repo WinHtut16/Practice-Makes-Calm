@@ -1,0 +1,19 @@
+{% extends "study/base.html" %}
+{% block content %}
+<h1>Welcome</h1>
+<div class="card prose">
+<p>In this study you will practise three short, difficult conversations with <strong>Dr. Lee</strong>, a fictional academic advisor played by an AI. At the end, a researcher will play Dr. Lee in one short face-to-face conversation.</p>
+<ul>
+  <li>The session takes about 60 minutes.</li>
+  <li>Dr. Lee is not a real person. The situations are made up; please do not share real personal information.</li>
+  <li>Your messages are sent to an AI service ({{ cfg.PROVIDER_LABEL }}) to generate Dr. Lee's replies.</li>
+  <li>Your data is stored under an anonymous ID ({{ p.pid }}).</li>
+  <li>You may skip anything or stop at any time, without giving a reason and without any penalty.</li>
+</ul>
+<p>The researcher will go through the consent form with you before you continue.</p>
+</div>
+<form method="post">{% csrf_token %}<input type="hidden" name="step_no" value="{{ p.step }}">
+  <label class="check"><input type="checkbox" name="agree" value="yes"> I have read the consent form and agree to take part.</label>
+  <button class="btn">Continue</button>
+</form>
+{% endblock %}

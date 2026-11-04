@@ -1,0 +1,9 @@
+{% extends "study/base.html" %}
+{% block content %}
+<h1>One conversation with a real person</h1>
+<div class="card scenario">
+  {% include "study/_facts.html" with c=s4 %}
+</div>
+<div class="card prose"><p>Please turn to the researcher, who will play Dr. Lee. Speak as you would to a real advisor. This conversation is audio recorded.</p></div>
+<form method="post">{% csrf_token %}<input type="hidden" name="step_no" value="{{ p.step }}"><p class="muted">Researcher: press Continue when the role-play has finished.</p><button class="btn">Continue</button></form>
+{% endblock %}

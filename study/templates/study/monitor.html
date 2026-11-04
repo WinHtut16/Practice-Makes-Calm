@@ -1,0 +1,61 @@
+{% extends "study/base.html" %}
+{% block title %}Monitor {{ p.pid }}{% endblock %}
+{% block bodyclass %}researcher{% endblock %}
+{% block content %}
+<p><a href="{% url 'researcher' %}">&larr; Console</a></p>
+<h1>{{ p.pid }} <span class="muted">· step {{ step_no }}/{{ step_total }}: {{ step }}{% if b is not None %} (block {{ b|add:1 }}{% if r is not None %}, round {{ r|add:1 }}{% endif %}){% endif %}</span></h1>
+{% if p.needs_attention %}
+<form method="post" class="notice row">{% csrf_token %}<span>⚠ {{ p.attention_note }}</span><button class="btn small" name="clear" value="1">Mark handled</button></form>
+{% endif %}
+<p>Participant link: <a href="{% url 'session' p.pid %}" target="_blank">/s/{{ p.pid }}/</a> · station {{ p.station }} · config {{ p.config_hash|default:"-" }}</p>
+<form method="post" class="row small">{% csrf_token %}
+  <button class="btn small ghost" name="skip" value="1">Skip current step ({{ step }})</button>
+  <span class="muted">Use only if the participant asks to skip. It is logged. Ask them to reload the page (F5) after.</span>
+</form>
+
+<h2>Blocks</h2>
+<table class="table">
+  <tr><th>Block</th><th>Colour</th><th>Scenario</th>{% if reveal %}<th>Design</th><th>Adaptive level now</th>{% endif %}</tr>
+  {% for bl in blocks %}<tr><td>{{ bl.position|add:1 }}</td><td>{{ bl.colour }}</td><td>{{ bl.scenario }}</td>
+  {% if reveal %}<td>{{ bl.get_design_display }}</td><td>{% if bl.design == "A" %}L{{ bl.current_level }}{% else %}-{% endif %}</td>{% endif %}</tr>{% endfor %}
+</table>
+<p class="small">{% if reveal %}<a href="?">Hide conditions</a>{% else %}Conditions hidden to keep the role-play researcher blind. <a href="?reveal=1">Reveal</a>{% endif %}</p>
+
+{% if show_script %}
+<div class="card script">
+  <h2>Role-play script (S4): {{ s4.title }}</h2>
+  <p><em>{{ s4.card }}</em></p>
+  <p class="small"><strong>Before you start:</strong> {{ s4.before }}</p>
+  <p class="small"><strong>Say to the participant:</strong> "{{ s4.intro }}"</p>
+  <table class="table small">{% for label, line in s4.script %}<tr><td><strong>{{ label }}</strong></td><td>"{{ line }}"</td></tr>{% endfor %}</table>
+  <p class="small"><strong>Allowed fillers:</strong> {% for f in s4.fillers %}"{{ f }}"{% if not forloop.last %} · {% endif %}{% endfor %} · <strong>Off-script question:</strong> "{{ s4.off_script }}"</p>
+  <ul class="small">{% for rule in s4.rules %}<li>{{ rule }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+{% if latest %}
+<h2>Latest conversation <span class="muted small">({{ latest.kind }}{% if reveal and latest.level %}, L{{ latest.level }}{% endif %}{% if latest.end_reason %}, ended: {{ latest.end_reason }}{% endif %})</span></h2>
+<div class="log monitor-log">{% for m in latest.messages.all %}<div class="msg {{ m.role }}">{{ m.text }}{% if m.latency_ms %} <span class="lat">{{ m.latency_ms }} ms</span>{% endif %}</div>{% endfor %}</div>
+{% endif %}
+
+<h2>Rounds</h2>
+<table class="table small">
+  <tr><th>Kind</th><th>Block</th><th>Round</th>{% if reveal %}<th>Level</th>{% endif %}<th>End</th><th>Stress</th>{% if reveal %}<th>Judge DESC</th><th>Decision</th>{% endif %}</tr>
+  {% for rd in rounds %}<tr><td>{{ rd.kind }}</td><td>{{ rd.block.position|add:1|default:"-" }}</td><td>{{ rd.index|add:1 }}</td>
+  {% if reveal %}<td>{{ rd.level|default:"-" }}</td>{% endif %}<td>{{ rd.end_reason|default:"open" }}</td><td>{{ rd.stress|default_if_none:"-" }}</td>
+  {% if reveal %}<td>{{ rd.judge_total|default_if_none:"-" }}</td><td>{{ rd.decision|default:"-" }}{% if rd.next_level %} → L{{ rd.next_level }}{% endif %}</td>{% endif %}</tr>{% endfor %}
+</table>
+
+<h2>Interview notes</h2>
+<ol class="small">{% for q in interview %}<li>{{ q }}</li>{% endfor %}</ol>
+<form method="post">{% csrf_token %}<textarea name="notes" rows="5" class="wide">{{ p.notes }}</textarea><button class="btn small">Save notes</button></form>
+<p class="small muted">This page refreshes every 5 seconds, except while you are typing notes.</p>
+
+<h2>Event log</h2>
+<ul class="small events">{% for e in events %}<li>{{ e.created|date:"H:i:s" }} · {{ e.kind }}{% if reveal or e.kind != "controller" and e.kind != "created" and e.kind != "round_start" %} · {{ e.detail }}{% endif %}</li>{% endfor %}</ul>
+{% endblock %}
+{% block scripts %}<script>
+(function(){var ta=document.querySelector('textarea[name=notes]'),dirty=false;
+ta.addEventListener('input',function(){dirty=true;});
+setInterval(function(){if(document.activeElement!==ta&&!dirty){location.reload();}},5000);})();
+</script>{% endblock %}

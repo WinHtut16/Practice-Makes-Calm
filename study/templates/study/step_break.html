@@ -1,0 +1,13 @@
+{% extends "study/base.html" %}
+{% block content %}
+<h1>Short break</h1>
+<div class="card prose center">
+  <p>Please look away from the screen and relax for a minute.</p>
+  <p class="bigtimer" id="brk" data-seconds="{{ cfg.BREAK_SECONDS }}">{{ cfg.BREAK_SECONDS }}</p>
+</div>
+<form method="post">{% csrf_token %}<input type="hidden" name="step_no" value="{{ p.step }}"><button class="btn" id="brkbtn" disabled>Start the next block</button></form>
+{% endblock %}
+{% block scripts %}<script>
+(function(){var el=document.getElementById('brk'),b=document.getElementById('brkbtn'),s=parseInt(el.dataset.seconds,10);
+var t=setInterval(function(){s--;el.textContent=Math.max(s,0);if(s<=0){clearInterval(t);b.disabled=false;el.textContent='Ready';}},1000);})();
+</script>{% endblock %}

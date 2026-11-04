@@ -1,0 +1,24 @@
+{% extends "study/base.html" %}
+{% block content %}
+<h1>Thank you!</h1>
+<div class="card prose">
+<p>You have finished the study. The researcher will now explain what we were testing.</p>
+<p>Dr. Lee is fictional. You practised with three versions that pushed back by different amounts: one that agreed easily, one that always pushed back firmly, and one that adjusted to how you were doing.</p>
+</div>
+<h2>A simple way to make a difficult request</h2>
+<p class="muted">Many people find the DESC steps useful. A strong request often covers all four, in any order.</p>
+<div class="card">
+<table class="table small">
+  <tr><th>Step</th><th>What it means</th><th>Example</th></tr>
+  {% for name, meaning, example in desc_guide %}<tr><td><strong>{{ name }}</strong></td><td>{{ meaning }}</td><td><em>"{{ example }}"</em></td></tr>{% endfor %}
+</table>
+</div>
+<h2>Your replies in the final checks</h2>
+<p class="muted">Look back at what you wrote. Which DESC steps did you use? Which one could you add next time?</p>
+{% for colour, title, replies in probe_replies %}
+<div class="card">
+  <p class="eyebrow">{{ colour }} Dr. Lee · {{ title }}</p>
+  {% for m in replies %}<div class="msg learner inline">{{ m.text }}</div>{% empty %}<p class="muted small">No replies recorded.</p>{% endfor %}
+</div>
+{% endfor %}
+{% endblock %}

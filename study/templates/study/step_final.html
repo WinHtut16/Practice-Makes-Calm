@@ -1,0 +1,14 @@
+{% extends "study/base.html" %}
+{% block content %}
+<h1>Which Dr. Lee helped you most?</h1>
+<p class="muted">Rank the three versions of Dr. Lee you practised with, from most helpful (1) to least helpful (3).</p>
+<form method="post" class="card">{% csrf_token %}<input type="hidden" name="step_no" value="{{ p.step }}">
+  {% for i in "123" %}
+  <label class="rank">Rank {{ i }}
+    <select name="rank{{ i }}"><option value="">Choose...</option>{% for c in colours %}<option value="{{ c }}">{{ c }} Dr. Lee</option>{% endfor %}</select>
+  </label>
+  {% endfor %}
+  <p class="muted">The researcher will then ask you a few short questions about your ranking.</p>
+  <button class="btn">Finish</button>
+</form>
+{% endblock %}

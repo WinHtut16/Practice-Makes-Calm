@@ -1,0 +1,18 @@
+{% extends "study/base.html" %}{% load study_extras %}
+{% block content %}
+<p class="eyebrow">Block {{ b|add:1 }} · after practice round {{ r|add:1 }}</p>
+<h1>How stressed do you feel right now?</h1>
+<form method="post" class="card">{% csrf_token %}<input type="hidden" name="step_no" value="{{ p.step }}">
+  <div class="stress">
+    <div class="stress-row">{% for v in "0,10"|seq %}<label><input type="radio" name="stress" value="{{ v }}" {% if posted.stress == v %}checked{% endif %}><span>{{ v }}</span></label>{% endfor %}</div>
+    <div class="stress-ends"><span>0 · Not at all stressed</span><span>10 · Extremely stressed</span></div>
+  </div>
+  {% if cfg.REFLECTION_PROMPT and r|add:1 < cfg.PRACTICE_ROUNDS %}
+  <fieldset class="field">
+    <legend>Next round starts fresh. Is there one thing you want to try differently? <span class="muted small">(optional)</span></legend>
+    <input type="text" name="reflection" maxlength="300" value="{{ posted.reflection|default:'' }}" placeholder="For example: give a date earlier">
+  </fieldset>
+  {% endif %}
+  <button class="btn">{% if r|add:1 < cfg.PRACTICE_ROUNDS %}Next practice round{% else %}Continue{% endif %}</button>
+</form>
+{% endblock %}

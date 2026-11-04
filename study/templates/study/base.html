@@ -1,0 +1,32 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Practice Makes Calm{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'study/style.css' %}">
+</head>
+<body class="{% block bodyclass %}{% endblock %}">
+<header class="top">
+  <span class="brand">Practice Makes Calm</span>
+  {% if progress is not None and p %}<div class="progress" title="Progress"><div style="width: {{ progress }}%"></div></div>{% endif %}
+  {% if colour %}<span class="chip chip-{{ colour|lower }}">{{ colour }} Dr. Lee</span>{% endif %}
+</header>
+<main class="wrap">
+{% if pause %}<div class="notice">Take a moment. The researcher will check in with you. Continue whenever you are ready.</div>{% endif %}
+{% if error %}<div class="error">{{ error }}</div>{% endif %}
+{% block content %}{% endblock %}
+</main>
+<script>
+document.querySelectorAll("form[method=post]").forEach(function (f) {
+  f.addEventListener("submit", function () {
+    if (f.dataset.sent) return;
+    f.dataset.sent = "1";
+    setTimeout(function () {
+      f.querySelectorAll("button").forEach(function (b) { b.disabled = true; b.dataset.label = b.textContent; b.textContent = "Saving..."; });
+    }, 0);
+  });
+});
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

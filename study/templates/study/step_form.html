@@ -1,0 +1,10 @@
+{% extends "study/base.html" %}
+{% block content %}
+<h1>{{ title }}</h1>
+{% if step == "block_survey" %}<p class="muted">Think about the conversations you just had with the <strong>{{ colour }}</strong> Dr. Lee.</p>{% endif %}
+{% if step == "pre" or step == "block_survey" or step == "human_survey" %}<p class="muted">For the statements about feelings, choose how you feel <strong>right now</strong>.</p>{% endif %}
+<form method="post" class="card">{% csrf_token %}<input type="hidden" name="step_no" value="{{ p.step }}">
+  {% include "study/_fields.html" %}
+  <button class="btn">Continue</button>
+</form>
+{% endblock %}

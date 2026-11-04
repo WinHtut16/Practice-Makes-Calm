@@ -1,0 +1,34 @@
+<div class="chat-layout">
+  <aside class="card scenario small">
+    <p class="eyebrow">{% if step == "warmup" %}Warm-up{% elif step == "probe" %}Final check{% else %}Practice round {{ r|add:1 }} of {{ cfg.PRACTICE_ROUNDS }}{% endif %}</p>
+    {% if step == "round" and r > 0 %}<p class="muted small">Fresh start: Dr. Lee does not remember the last round. You can try a different approach.</p>{% endif %}
+    {% if card %}{% include "study/_facts.html" with c=card %}{% else %}{% include "study/_facts.html" with c=scenario %}{% endif %}
+    {% if step == "probe" %}<p class="notice small">{{ probe_intro }}</p><p class="muted">Reply to each of Dr. Lee's messages.</p>{% endif %}
+  </aside>
+  <section class="chat card">
+    <div class="chat-head"><strong>{{ partner }}</strong>
+      {% if step != "probe" and rnd.is_open %}<span class="muted small">Time left <span id="timer" class="timer" data-seconds="{{ cfg.ROUND_SECONDS }}" data-started="{{ rnd.started|date:'U' }}"></span></span>{% endif %}
+    </div>
+    <div id="log" class="log">
+      {% for m in messages_list %}<div class="msg {{ m.role }}">{{ m.text }}</div>{% endfor %}
+    </div>
+    <div id="status" class="status"></div>
+    <div class="composer" id="composer">
+      <textarea id="text" rows="2" placeholder="Type your message..." maxlength="1000"></textarea>
+      <button id="send" class="btn">Send</button>
+    </div>
+    {% if step != "probe" %}<div class="chat-foot" id="stopwrap"><button type="button" class="linkbtn" id="stop">I want to stop this round</button></div>{% endif %}
+    <form method="post" id="next" class="next {% if rnd.is_open %}hidden{% endif %}">{% csrf_token %}<input type="hidden" name="step_no" value="{{ p.step }}">
+      <p id="donemsg">This conversation has ended.</p>
+      <button class="btn">Continue</button>
+    </form>
+  </section>
+</div>
+<script>
+window.CHAT = {
+  url: "{% url 'api_chat' p.pid %}", timeoutUrl: "{% url 'api_timeout' p.pid %}",
+  open: {{ rnd.is_open|yesno:"true,false" }}, maxMessages: {% if step == "probe" %}4{% else %}{{ cfg.ROUND_MAX_MESSAGES }}{% endif %},
+  sent: {{ learner_count }}, mode: "{{ step }}", partner: "{{ partner }}",
+  csrf: "{{ csrf_token }}"
+};
+</script>

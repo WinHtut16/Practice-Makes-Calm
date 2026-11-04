@@ -1,0 +1,19 @@
+{% load study_extras %}
+{% for f in fields %}{% with cur=posted|getitem:f.name %}
+<fieldset class="field">
+  <legend>{{ f.label }}</legend>
+  {% if f.type == "likert" %}
+    <div class="likert">
+      <span class="end">{{ f.low }}</span>
+      {% for v in "1,7"|seq %}<label><input type="radio" name="{{ f.name }}" value="{{ v }}" {% if cur == v %}checked{% endif %}><span>{{ v }}</span></label>{% endfor %}
+      <span class="end">{{ f.high }}</span>
+    </div>
+  {% elif f.type == "radio" %}
+    <div class="options">{% for v, lab in f.options %}<label><input type="radio" name="{{ f.name }}" value="{{ v }}" {% if cur == v %}checked{% endif %}> {{ lab }}</label>{% endfor %}</div>
+  {% elif f.type == "number" %}
+    <input type="number" name="{{ f.name }}" min="{{ f.min }}" max="{{ f.max }}" value="{{ cur }}" class="short">
+  {% else %}
+    <input type="text" name="{{ f.name }}" maxlength="100" value="{{ cur }}">
+  {% endif %}
+</fieldset>
+{% endwith %}{% endfor %}

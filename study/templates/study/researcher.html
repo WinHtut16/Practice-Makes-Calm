@@ -1,0 +1,32 @@
+{% extends "study/base.html" %}
+{% block bodyclass %}researcher{% endblock %}
+{% block content %}
+<h1>Researcher console</h1>
+<p class="muted">LLM mode: <strong>{% if cfg.MOCK %}MOCK (no API calls){% else %}{{ cfg.PROVIDER_LABEL }} · {{ cfg.MODEL }}{% endif %}</strong> · Station <strong>{{ station }}</strong>{% if multi %} (sequences {{ cfg.STATION_SEQUENCES|join:", " }}){% else %} (single-laptop mode: all sequences){% endif %} · Config <strong>{{ config_hash }}</strong> · Real participants used: {{ real_used }}/{{ cfg.MAIN_SEQUENCES|length }}</p>
+{% if hash_changed %}<div class="notice">Some participants were run with a different configuration ({{ hash_changed|join:", " }}). Prompts, materials or settings changed since then. That is fine during piloting, but freeze everything before the main study.</div>{% endif %}
+{% if cfg.MOCK %}<div class="notice">Mock mode: Dr. Lee is a fake script. Do not run pilots or real participants in mock mode.</div>{% endif %}
+<form method="post" action="{% url 'researcher_new' %}" class="card">{% csrf_token %}
+  <div class="row">
+    <label class="small">Main sequence
+      <select name="main_seq"><option value="">Next free ({{ free_main|first|default:"none left" }})</option>{% for n in free_main %}<option value="{{ n }}">P{{ n|stringformat:"02d" }}</option>{% endfor %}</select></label>
+    <button class="btn" name="pilot" value="0">New participant</button>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <label class="small">Pilot sequence
+      <select name="pilot_seq"><option value="">Next free</option>{% for n in free_pilot %}<option value="{{ n }}">{{ n }}</option>{% endfor %}</select></label>
+    <button class="btn ghost" name="pilot" value="1">New pilot participant</button>
+  </div>
+</form>
+<p class="muted small">Main participants get the 5 balanced sequences (the square P01, P06, P08 first, then P10, P15). In two-laptop mode each laptop only hands out its own sequences (STATION_SEQUENCES in .env). Pilot participants are excluded from analysis.</p>
+<table class="table">
+  <tr><th>ID</th><th>Station</th><th>Step</th><th>Started</th><th>Finished</th><th>Flag</th><th></th></tr>
+  {% for p, step in rows %}
+  <tr class="{% if p.needs_attention %}flag{% endif %}">
+    <td><strong>{{ p.pid }}</strong></td><td>{{ p.station }}</td><td>{{ step }}</td><td>{{ p.created|date:"M d H:i" }}</td>
+    <td>{{ p.finished|date:"H:i"|default:"-" }}</td><td>{{ p.attention_note }}</td>
+    <td><a href="{% url 'monitor' p.pid %}">monitor</a> · <a href="{% url 'session' p.pid %}" target="_blank">participant link</a></td>
+  </tr>
+  {% empty %}<tr><td colspan="7" class="muted">No participants yet.</td></tr>{% endfor %}
+</table>
+<p><a href="/admin/">Admin (raw data)</a></p>
+{% endblock %}

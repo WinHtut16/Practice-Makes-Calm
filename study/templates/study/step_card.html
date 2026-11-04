@@ -1,0 +1,13 @@
+{% extends "study/base.html" %}
+{% block content %}
+<p class="eyebrow">Block {{ b|add:1 }} of 3 · {{ colour }} Dr. Lee</p>
+<h1>{{ scenario.title }}</h1>
+<div class="card scenario">
+  {% include "study/_facts.html" with c=scenario %}
+</div>
+<div class="card prose">
+  <p>You will practise this conversation <strong>{{ cfg.PRACTICE_ROUNDS }} times</strong> with the {{ colour }} Dr. Lee, then do a short final check. Each practice round lasts up to 4 minutes or {{ cfg.ROUND_MAX_MESSAGES }} messages. Every round starts fresh.</p>
+  <p>You start the conversation. Use your own words; your English does not need to be perfect. <strong>Short messages are fine</strong>, for example: <em>"Sensor broke Monday. Need until next Friday. Partial results Wednesday."</em> The facts stay on screen during the chat, so you do not need to remember them.</p>
+</div>
+<form method="post">{% csrf_token %}<input type="hidden" name="step_no" value="{{ p.step }}"><button class="btn">Start practice round 1</button></form>
+{% endblock %}

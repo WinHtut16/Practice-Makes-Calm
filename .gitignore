@@ -1,0 +1,14 @@
+.env
+db.sqlite3
+__pycache__/
+*.pyc
+exports/
+scoring_out/
+pilot_out/
+staticfiles/
+venv/
+.venv/
+*.sqlite3
+bundles/
+roleplay_txt/
+.vscode/

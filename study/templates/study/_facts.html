@@ -1,0 +1,5 @@
+{# Scannable fact list: "facts" from content.py. Usage: include with c=<scenario dict> #}
+<p class="small muted" style="margin:0 0 4px">You are a first-year master's student. Dr. Lee is your advisor.</p>
+<ul class="facts">{% for f in c.facts %}<li>{{ f|safe }}</li>{% endfor %}</ul>
+<p class="goal"><strong>Your goal:</strong> {{ c.goal }}</p>
+<p class="small muted">{{ card_hint }}</p>
